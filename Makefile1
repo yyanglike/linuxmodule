@@ -1,0 +1,11 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -g
+LDFLAGS = -lparted
+
+all: main
+
+main: main.c
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+
+clean:
+	rm -f main

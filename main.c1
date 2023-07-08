@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <parted/parted.h>
+
+int main() {
+    PedDevice* device;
+    PedDisk* disk;
+    PedPartition* part;
+
+    ped_device_probe_all();
+    device = ped_device_get_next(NULL);
+    while (device != NULL) {
+        disk = ped_disk_new(device);
+        if (disk != NULL) {
+            printf("磁盘设备: %s\n", ped_device_get_path(device));
+            printf("磁盘大小: %lld MB\n", ped_disk_get_length(disk) / (1024 * 1024));
+
+            part = ped_disk_next_partition(disk, NULL);
+            while (part != NULL) {
+                printf("分区号: %d\n", part->num);
+                printf("分区类型: %s\n", ped_partition_type_get_name(part->type));
+                printf("起始扇区: %lld\n", part->geom.start);
+                printf("结束扇区: %lld\n", part->geom.end);
+                printf("分区大小: %lld MB\n", ped_partition_get_length(part) / (1024 * 1024));
+
+                part = ped_disk_next_partition(disk, part);
+            }
+            printf("\n");
+
+            ped_disk_destroy(disk);
+        }
+        device = ped_device_get_next(device);
+    }
+    ped_device_free_all();
+
+    return 0;
+}
